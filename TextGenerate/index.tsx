@@ -1,63 +1,60 @@
 import React, { useEffect, useState } from 'react';
 import styles from './styles.module.css';
-import { staticCode } from './sampleCode';
 import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { sublime } from '@uiw/codemirror-theme-sublime';
+import { staticCode } from '../TextGenerate/sampleCode';
 
-var intervalId: any;
+var timer: any;
 export default function TextGenerate() {
-  // Write your code here
-  const [text, setText] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [code, setCode] = useState('// Click Start Generating to see magic');
+  const [started, setStarted] = useState(false);
 
-  const startGenerating = () => {
-    if (isGenerating) {
-      return;
-    }
-    setIsGenerating(true);
+  const startCreating = () => {
+    let i = 0;
+    let generatedCode = '';
+
+    timer = setInterval(() => {
+      if (i === staticCode.length - 1) clearInterval(timer);
+      generatedCode = generatedCode + staticCode[i];
+      i++;
+      setCode(generatedCode);
+    }, 10);
   };
 
-  const reset = () => {
-    setText('');
-    setIsGenerating(false);
-    clearInterval(intervalId);
+  const handleGenerate = () => {
+    setStarted(true);
+  };
+  const handleReset = () => {
+    setCode('//  Click Start Generating to see magic');
+    clearInterval(timer);
+    setStarted(false);
   };
 
   useEffect(() => {
-    let index = 0;
-
-    const generateText = () => {
-      if (index < staticCode.length) {
-        setText((text) => text + staticCode.charAt(index));
-        index++;
-      } else {
-        clearInterval(intervalId);
-        setIsGenerating(false);
-      }
-    };
-
-    if (isGenerating) {
-      intervalId = setInterval(generateText, 10);
+    console.log('started', started);
+    if (started) {
+      console.log('called ');
+      startCreating();
     }
 
     return () => {
-      clearInterval(intervalId);
+      clearInterval(timer);
     };
-  }, [isGenerating]);
+  }, [started]);
   return (
     <React.Fragment>
       <div className={styles.buttonsContainer}>
-        <button onClick={startGenerating} className={styles.button}>
+        <button onClick={handleGenerate} className={styles.button}>
           Start Generating
         </button>
-        <button onClick={reset} className={styles.button}>
+        <button onClick={handleReset} className={styles.button}>
           Reset
         </button>
       </div>
       <div className={styles.container}>
         <CodeMirror
-          value={text}
+          value={code}
           height="300px"
           className={styles.codeMirror}
           extensions={[javascript({ jsx: true })]}
