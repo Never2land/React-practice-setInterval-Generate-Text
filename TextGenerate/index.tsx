@@ -5,7 +5,7 @@ import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { sublime } from '@uiw/codemirror-theme-sublime';
 
-var timer: any;
+var intervalId: any;
 export default function TextGenerate() {
   // Write your code here
   const [text, setText] = useState('');
@@ -21,7 +21,7 @@ export default function TextGenerate() {
   const reset = () => {
     setText('');
     setIsGenerating(false);
-    clearInterval(timer);
+    clearInterval(intervalId);
   };
 
   useEffect(() => {
@@ -32,17 +32,17 @@ export default function TextGenerate() {
         setText((text) => text + staticCode.charAt(index));
         index++;
       } else {
-        clearInterval(timer);
+        clearInterval(intervalId);
         setIsGenerating(false);
       }
     };
 
     if (isGenerating) {
-      timer = setInterval(generateText, 10);
+      intervalId = setInterval(generateText, 10);
     }
 
     return () => {
-      clearInterval(timer);
+      clearInterval(intervalId);
     };
   }, [isGenerating]);
   return (
